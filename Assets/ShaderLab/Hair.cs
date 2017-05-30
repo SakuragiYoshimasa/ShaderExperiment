@@ -7,7 +7,7 @@ namespace ShaderLab {
 
 	public class Hair : ScriptableObject {
 		[SerializeField] public int divisions = 4;
-		[SerializeField] public int segments = 8;
+		[SerializeField] public int segments = 32;
 		[SerializeField] public Mesh mesh;
 
 		public void RebuildMesh(){

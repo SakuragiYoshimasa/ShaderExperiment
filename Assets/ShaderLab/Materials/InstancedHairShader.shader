@@ -1,16 +1,20 @@
 ﻿ Shader "Instanced/InstancedHairShader" {
     Properties {
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
+        _MainColor ("Color", Color) = (1.0, 1.0, 1.0, 1.0)
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
+        _Scale("Scale", Range(1.0, 10.0)) = 1.0
     }
     SubShader {
         Tags { "RenderType"="Opaque" }
+        //Pass{ Cull off}
     
         CGPROGRAM
-        #pragma surface surf Standard vertex:vert addshadow
+        #pragma surface surf Standard vertex:vert
         #pragma instancing_options procedural:setup
-
+        #include "SimplexNoise3D.cginc"
+        
         sampler2D _MainTex;
 
         struct Input {
@@ -23,25 +27,28 @@
         uint _ArraySize;
         uint _InstanceCount;
         uint _SegmentCount;
+        float3 _Gravity;
+        float _Scale;
+        float _ZScale;
+        float _NoisePower;
         #endif
 
-        void vert(inout appdata_full v, out Input data)
-        {
+        void vert(inout appdata_full v, out Input data){
             UNITY_INITIALIZE_OUTPUT(Input, data);
         
-
-            #ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
+        #ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
 
             float phi = v.vertex.x;
             int seg = (int)v.vertex.z;
 
+            float id = (float)unity_InstanceID;
             float4 base =  _PositionBuffer[unity_InstanceID];
             float4 rotation = _RotationBuffer[unity_InstanceID];
             float radius = base.w;
-            float length = 0.01 * rotation.w;
+            float length = rotation.w;
 
             float2 xy = float2(cos(phi), sin(phi)) * radius * ((float)(_SegmentCount - seg) / (float)_SegmentCount);
-            float4 offset = float4(xy, v.vertex.z * length, 1.0);
+            float4 offset = float4(xy, v.vertex.z * length * _ZScale, 1.0);
             
             float a = -rotation.x;
             float b = -rotation.y;
@@ -57,10 +64,27 @@
             rotateMat._31_32_33_34 = low3;
             rotateMat._41_42_43_44 = low4;
 
-            v.vertex.xyz = base.xyz + mul(offset, rotateMat);
-            //v.normal.xyz = vn * xy.x + vb * xy.y;
-            //v.texcoord = cp;
-            #endif
+            if(seg != 0){
+                offset.x += snoise(float3(
+                    (float)seg * 0.02 + sin(_Time.x + id * 0.1),
+                    radius + sin(_Time.x +(float)seg * 0.03) * cos(_Time.y -  id * 0.1),
+                    length + cos(_Time.y))) * _NoisePower;
+                     
+                offset.y += snoise(float3(
+                    (float)seg * 0.02 + cos(_Time.y), 
+                    radius - sin(_Time.y) * cos(_Time.x +(float)seg * 0.03 + id * 0.1), 
+                    length + cos(_Time.x +(float)seg * 0.03 + id *0.2))) * _NoisePower;
+            }
+
+            float3 pos = mul(offset, rotateMat).xyz;
+            
+            pos.z -= _Gravity.z * (abs(pos.x) + abs(pos.y - 1.5)) * 0.03;
+            v.vertex.xyz = (base.xyz + pos.xyz) * _Scale;
+
+            float3 n_normal = float3(cos(phi), sin(phi), 0);
+            v.normal.xyz = mul(n_normal, rotateMat);
+
+        #endif
         }
 
         void setup(){
@@ -70,9 +94,10 @@
 
         half _Glossiness;
         half _Metallic;
+        fixed4 _MainColor;
 
         void surf (Input IN, inout SurfaceOutputStandard o) {
-            fixed4 c = tex2D (_MainTex, IN.uv_MainTex);
+            fixed4 c = _MainColor;
             o.Albedo = c.rgb;
             o.Metallic = _Metallic;
             o.Smoothness = _Glossiness;

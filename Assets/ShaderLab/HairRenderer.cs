@@ -9,20 +9,25 @@ namespace ShaderLab{
 		[SerializeField] Mesh _targetmesh;
 		[SerializeField] Material _material;
 		[SerializeField] int _instanceCount;
+		[SerializeField] float _scale = 1.0f;
+		[SerializeField] float _zScale = 0.07f;
+		[SerializeField] float _noisePower = 0.1f;
+		[SerializeField] Vector3 _gravity = new Vector3(0f, -8.0f, 4.0f);
+		[SerializeField] Color _color = new Vector4(0,0,0,0);
 
 		uint[] _drawArgs = new uint[5]{0, 0, 0, 0, 0};
 		ComputeBuffer _drawArgsBuffer;
 		ComputeBuffer positionBuffer;
 		ComputeBuffer rotationBuffer;
 
-		Bounds _bounds = new Bounds(Vector3.zero, Vector3.one * 128*64);
+		Bounds _bounds = new Bounds(Vector3.zero, Vector3.one * 4 * 32);
 		MaterialPropertyBlock _props;
 
 		void Start(){
 			UpdateBuffers();
 
 			_drawArgsBuffer = new ComputeBuffer(1, 5 * sizeof(uint), ComputeBufferType.IndirectArguments);
-			_drawArgs[0] = _hair.mesh.GetIndexCount(0);
+			_drawArgs[0] = (uint)_hair.mesh.GetIndexCount(0);
 			_drawArgs[1] = (uint)_instanceCount;
 			_drawArgsBuffer.SetData(_drawArgs);
 
@@ -36,6 +41,12 @@ namespace ShaderLab{
 
 
 		void LateUpdate(){
+			_material.SetFloat("_Scale",_scale);
+			_material.SetFloat("_ZScale",_zScale);
+			_material.SetFloat("_NoisePower",_noisePower);
+			_material.SetVector("_Gravity", _gravity);
+			_material.SetFloat("_Scale",_scale);
+			_material.SetColor("_MainColor", _color);
 			Graphics.DrawMeshInstancedIndirect(_hair.mesh, 0, _material, _bounds, _drawArgsBuffer, 0, _props);
 		}
 
@@ -44,28 +55,32 @@ namespace ShaderLab{
 				positionBuffer.Release();
 			if(rotationBuffer != null)
 				rotationBuffer.Release();
-			positionBuffer = new ComputeBuffer(_instanceCount, sizeof(float));
-			rotationBuffer = new ComputeBuffer(_instanceCount, sizeof(float));
+			positionBuffer = new ComputeBuffer(_instanceCount, sizeof(float) * 4);
+			rotationBuffer = new ComputeBuffer(_instanceCount, sizeof(float) * 4);
+			
 
 			Vector4[] positions = new Vector4[_instanceCount];
 			Vector4[] rotations = new Vector4[_instanceCount];
 
 			int targetTriangleCount = _targetmesh.triangles.Length / 3;
-			//Debug.Log(targetTriangleCount);
 			
-			HashSet<int> used = new HashSet<int>();
+			//HashSet<int> used = new HashSet<int>();
+			HashSet<int> nouse = new HashSet<int>();
 			int index = (int)Random.Range(0f, targetTriangleCount + 0.5f);
-			float threshold = 0.3f;
+			float threshold = 0.1f;
 
 			for (int i=0; i < _instanceCount; i++) {
 				index = (index + (int)Random.Range(0f, targetTriangleCount + 0.5f)) % targetTriangleCount;
 
-				while(used.Contains(index)){
+				//while(used.Contains(index) || nouse.Contains(index)){
+				//	index = (index + (int)Random.Range(0f, targetTriangleCount + 0.5f)) % targetTriangleCount;
+				//	if(used.Count > (float)_instanceCount * 0.8f){
+				//		used.Clear();
+				//	}
+				//}
+				//used.Add(index);
+				while(nouse.Contains(index)){
 					index = (index + (int)Random.Range(0f, targetTriangleCount + 0.5f)) % targetTriangleCount;
-					if(used.Count > (float)_instanceCount * 0.8f){
-						used.Clear();
-						threshold += 0.2f;
-					}
 				}
 
 				Vector3 v1 = _targetmesh.vertices[_targetmesh.triangles[index * 3]];
@@ -76,27 +91,26 @@ namespace ShaderLab{
 				Vector3 n2 = _targetmesh.normals[_targetmesh.triangles[index * 3 + 1]];
 				Vector3 n3 = _targetmesh.normals[_targetmesh.triangles[index * 3 + 2]];
 				
-				float mag = (v1 - v2).magnitude;
-				if(mag < threshold) continue;
-				int additionalCount = (int)((v1 - v2).magnitude * 10.0f);
-				//Debug.Log(additionalCount);
-
-				for(int j=0; j < additionalCount && i < _instanceCount; j++){
-
-					float p1 = Random.Range(0, 1.0f);
-					float p2 = Random.Range(0, 1.0f - p1);
-					float p3 = 1.0f - p1 - p2;
-					Vector3 p = v1 * p1 + v2 * p2 + v3 * p3;
-					Vector3 n = n1 * p1 + n2 * p2 + n3 * p3;
-
-					float radius = Random.Range(0.001f, 0.01f);
-					positions[i] = new Vector4(p.x, p.y, p.z, radius);
-
-					Vector3 rotation = Quaternion.LookRotation(n, Vector3.up).eulerAngles;
-					rotations[i] = new Vector4(rotation.x / 180.0f * Mathf.PI, rotation.y / 180.0f * Mathf.PI, rotation.z / 180.0f * Mathf.PI, (float)additionalCount);
-
-					i++;
+				float mag = ((v1 - v2).magnitude + (v2 - v3).magnitude + (v1 - v3).magnitude)/3.0f; 
+				if(mag < threshold) {
+					nouse.Add(index);
+					i--;
+					continue;
 				}
+
+				float p1 = Random.Range(0, 1.0f);
+				float p2 = Random.Range(0, 1.0f - p1);
+				float p3 = 1.0f - p1 - p2;
+				Vector3 p = v1 * p1 + v2 * p2 + v3 * p3;
+				Vector3 n = n1 * p1 + n2 * p2 + n3 * p3 + new Vector3(0, 1.0f,0);
+
+				float radius = Random.Range(0.015f, 0.05f);
+				//float radius = Random.Range(0.5f, 3f);
+				positions[i] = new Vector4(p.x, p.y, p.z, radius);
+
+				Vector3 rotation = Quaternion.LookRotation(n, Vector3.up).eulerAngles;
+				rotations[i] = new Vector4(rotation.x / 180.0f * Mathf.PI, rotation.y / 180.0f * Mathf.PI, rotation.z / 180.0f * Mathf.PI, mag);
+				//Debug.Log(positions[i]);
 			}
 			positionBuffer.SetData(positions);
 			rotationBuffer.SetData(rotations);
