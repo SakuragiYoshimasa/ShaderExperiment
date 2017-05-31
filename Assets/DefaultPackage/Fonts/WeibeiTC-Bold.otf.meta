@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 12d63ffd3bfb44b979ece1725744460a
+timeCreated: 1488000973
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Weibei TC
+  fontNames:
+  - Weibei TC
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

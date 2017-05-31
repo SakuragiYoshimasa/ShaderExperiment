@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 51abcf16e9a9a4ea185f05728dda8f74
+timeCreated: 1488000973
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: CircleD
+  fontNames:
+  - CircleD
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

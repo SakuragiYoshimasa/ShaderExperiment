@@ -8,7 +8,6 @@
     }
     SubShader {
         Tags { "RenderType"="Opaque" }
-        //Pass{ Cull off}
     
         CGPROGRAM
         #pragma surface surf Standard vertex:vert
