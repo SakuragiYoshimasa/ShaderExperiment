@@ -2,6 +2,7 @@
     Properties {
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
         _MainColor ("Color", Color) = (1.0, 1.0, 1.0, 1.0)
+        _GradColor ("Color", Color) = (1.0, 1.0, 1.0, 1.0)
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
         _Scale("Scale", Range(1.0, 10.0)) = 1.0
@@ -18,6 +19,7 @@
 
         struct Input {
             float2 uv_MainTex;
+            int seg;
         };
 
         #ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
@@ -39,6 +41,7 @@
 
             float phi = v.vertex.x;
             int seg = (int)v.vertex.z;
+            data.seg = seg;
 
             float id = (float)unity_InstanceID;
             float4 base =  _PositionBuffer[unity_InstanceID];
@@ -73,11 +76,13 @@
                     (float)seg * 0.02 + cos(_Time.y), 
                     radius - sin(_Time.y) * cos(_Time.x +(float)seg * 0.03 + id * 0.1), 
                     length + cos(_Time.x +(float)seg * 0.03 + id *0.2))) * _NoisePower;
+                
+                
             }
 
             float3 pos = mul(offset, rotateMat).xyz;
-            
-            pos.z -= _Gravity.z * (abs(pos.x) + abs(pos.y - 1.5)) * 0.03;
+            if(seg!=0) pos += _Gravity * (abs(pos.x) + abs(pos.y - 1.5)) * 0.03;
+
             v.vertex.xyz = (base.xyz + pos.xyz) * _Scale;
 
             float3 n_normal = float3(cos(phi), sin(phi), 0);
@@ -94,13 +99,16 @@
         half _Glossiness;
         half _Metallic;
         fixed4 _MainColor;
+        fixed4 _GradColor;
 
         void surf (Input IN, inout SurfaceOutputStandard o) {
-            fixed4 c = _MainColor;
+            #ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
+            fixed4 c = _MainColor * (float)IN.seg / _SegmentCount + (1.0 -  (float)IN.seg / _SegmentCount) * _GradColor;
             o.Albedo = c.rgb;
             o.Metallic = _Metallic;
             o.Smoothness = _Glossiness;
             o.Alpha = c.a;
+            #endif
         }
         ENDCG
     }

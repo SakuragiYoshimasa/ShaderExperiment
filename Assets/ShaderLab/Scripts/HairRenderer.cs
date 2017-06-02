@@ -14,6 +14,7 @@ namespace ShaderLab{
 		[SerializeField] float _noisePower = 0.1f;
 		[SerializeField] Vector3 _gravity = new Vector3(0f, -8.0f, 4.0f);
 		[SerializeField] Color _color = new Vector4(0,0,0,0);
+		[SerializeField] Color _gradcolor = new Vector4(0,0,0,0);
 
 		uint[] _drawArgs = new uint[5]{0, 0, 0, 0, 0};
 		ComputeBuffer _drawArgsBuffer;
@@ -47,6 +48,7 @@ namespace ShaderLab{
 			_material.SetVector("_Gravity", _gravity);
 			_material.SetFloat("_Scale",_scale);
 			_material.SetColor("_MainColor", _color);
+			_material.SetColor("_GradColor", _gradcolor);
 			Graphics.DrawMeshInstancedIndirect(_hair.mesh, 0, _material, _bounds, _drawArgsBuffer, 0, _props);
 		}
 
