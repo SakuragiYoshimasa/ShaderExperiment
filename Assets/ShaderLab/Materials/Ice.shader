@@ -1,6 +1,6 @@
 ﻿Shader "ShaderLab/Ice" {
 	SubShader {
-		Tags { "Queue"="Transparent" }
+		Tags { "Queue"="Transparent"}
 		LOD 200
 		
 		CGPROGRAM

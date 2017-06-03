@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 38e3edba3ce914372a8db1943226eedd
+timeCreated: 1496469925
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - positionExtractionShader: {fileID: 4800000, guid: d6b342f9e99084b21bcc294d6d937fc0,
+      type: 3}
+  - placeHolder: {fileID: 2100000, guid: bd392cf2acf7149a1842299b835f8bdf, type: 2}
+  - targetSMR: {instanceID: 0}
+  - prevPositionBuffer: {instanceID: 0}
+  - currPositionBuffer: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

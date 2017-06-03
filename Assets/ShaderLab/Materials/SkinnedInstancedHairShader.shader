@@ -1,4 +1,4 @@
-﻿ Shader "Instanced/InstancedHairShader" {
+﻿ Shader "Instanced/SkinnedInstancedHairShader" {
     Properties {
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
         _MainColor ("Color", Color) = (1.0, 1.0, 1.0, 1.0)
@@ -25,6 +25,7 @@
         #ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
         StructuredBuffer<float4> _PositionBuffer;
         StructuredBuffer<float4> _RotationBuffer;
+        StructuredBuffer<float4> _PrevPositionBuffer;
         uint _ArraySize;
         uint _InstanceCount;
         uint _SegmentCount;
@@ -45,6 +46,10 @@
 
             float id = (float)unity_InstanceID;
             float4 base =  _PositionBuffer[unity_InstanceID];
+            float3 prev = _PrevPositionBuffer[unity_InstanceID].xyz;
+
+            base.xyz = ((float)(_SegmentCount - seg) / (float)_SegmentCount) * base.xyz +  ((float)seg / (float)_SegmentCount) * prev;
+
             float4 rotation = _RotationBuffer[unity_InstanceID];
             float radius = base.w;
             float length = rotation.w;
