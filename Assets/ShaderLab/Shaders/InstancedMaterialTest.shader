@@ -9,7 +9,6 @@
         LOD 200
 
         CGPROGRAM
-        // Physically based Standard lighting model
         #pragma surface surf Standard addshadow fullforwardshadows
         #pragma multi_compile_instancing
         #pragma instancing_options procedural:setup

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace ShaderLab{
@@ -65,11 +64,9 @@ namespace ShaderLab{
 			_material.SetFloat("_Scale",_scale);
 			_material.SetColor("_MainColor", _color);
 			_material.SetColor("_GradColor", _gradcolor);
-
 			_material.SetBuffer("_PositionBuffer", positionBuffer);
 			_material.SetBuffer("_RotationBuffer", rotationBuffer);
 			_material.SetBuffer("_PrevPositionBuffer", prevPositionBuffer);
-
 			Graphics.DrawMeshInstancedIndirect(_hair.mesh, 0, _material, _bounds, _drawArgsBuffer, 0, _props);
 		}
 
@@ -80,10 +77,9 @@ namespace ShaderLab{
 			var data = new Vector4[_instanceCount];
 			positionBuffer.GetData(data);
 			prevPositionBuffer.SetData(data);
-			//WR
+			
 			_recalcGlownPositionsShader.SetBuffer(kernel, "PositionBuffer", positionBuffer); 
 			_recalcGlownPositionsShader.SetBuffer(kernel, "RotationBuffer", rotationBuffer); 
-			//Read only
 			_recalcGlownPositionsShader.SetBuffer(kernel, "IndicesBuffer", indicesBuffer);  
 			_recalcGlownPositionsShader.SetBuffer(kernel, "WeightsBuffer", weightsBuffer);
 			_recalcGlownPositionsShader.SetTexture(kernel, "CurrPositionBuffer", asm.CurrPositionBuffer);

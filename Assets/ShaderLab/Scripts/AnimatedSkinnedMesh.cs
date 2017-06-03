@@ -8,10 +8,10 @@ namespace ShaderLab{
 		[SerializeField] Shader positionExtractionShader;
 		[SerializeField] Material placeHolder;
 		[SerializeField] public SkinnedMeshRenderer targetSMR;
-		private Camera camera;
 		RenderTexture prevPositionBuffer;
 		RenderTexture currPositionBuffer;
 		RenderTexture currNormalBuffer;
+		private Camera camera;
 
 		public RenderTexture CurrPositionBuffer {
 			get {
@@ -41,7 +41,6 @@ namespace ShaderLab{
 			
 			//Camera Attatchment
 			GameObject cameraobj = new GameObject("Camera");
-			
 			cameraobj.hideFlags = HideFlags.HideInHierarchy;
 			camera = cameraobj.AddComponent<Camera>();
 			camera.clearFlags = CameraClearFlags.SolidColor;
@@ -82,7 +81,6 @@ namespace ShaderLab{
 			RenderTexture temp = currPositionBuffer;
 			currPositionBuffer = prevPositionBuffer;
 			prevPositionBuffer = temp;
-			//temp.Release();
 		}
 
 		void ReceateMesh(){
@@ -94,10 +92,7 @@ namespace ShaderLab{
 			var normals = new List<Vector3>(origMesh.normals);
 			var tangents = new List<Vector4>(origMesh.tangents);
 			var boneWeights = new List<BoneWeight>(origMesh.boneWeights);
-
 			int[] indices = new int[origMesh.vertexCount];
-			//mesh.SetIndices(indices, MeshTopology.Triangles, 0);
-			//mesh.bindposes = origMesh.bindposes;
 			
 			List<Vector2> uv = new List<Vector2>();
 			for(int i = 0; i < origMesh.vertexCount; i++){
@@ -125,6 +120,5 @@ namespace ShaderLab{
 			if(currPositionBuffer != null) currPositionBuffer.Release();
 			if(currNormalBuffer != null) currNormalBuffer.Release();
 		}
-		
 	}
 }

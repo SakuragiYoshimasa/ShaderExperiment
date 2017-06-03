@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
-using System.IO;
 
 namespace ShaderLab {
 
@@ -23,10 +21,8 @@ namespace ShaderLab {
 			List<int> indices = new List<int>();
 			int refi = 0;
 
-			 for (var i = 0; i < segments; i++)
-            {
-                for (var j = 0; j < divisions; j++)
-                {
+			 for (var i = 0; i < segments; i++){
+                for (var j = 0; j < divisions; j++){
                     indices.Add(refi);
                     indices.Add(refi + 1);
                     indices.Add(refi + 1 + divisions);

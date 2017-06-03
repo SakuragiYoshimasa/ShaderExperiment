@@ -40,9 +40,7 @@
 				return o;
 			}
 			
-			
 			fragout frag (v2f i) : SV_TARGET0 {
-				//return float4(255.0, 255.0, 255.0, 255.0);
 				fragout o;
 				o.position = float4(i.texcoord, 1.0);
 				o.normal = float4(i.normal, 1.0);
