@@ -6,6 +6,7 @@
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
         _Scale("Scale", Range(1.0, 10.0)) = 1.0
+        
     }
     SubShader {
         Tags { "RenderType"="Opaque" }
@@ -33,6 +34,8 @@
         float _Scale;
         float _ZScale;
         float _NoisePower;
+        float _Frequency;
+        float _RadiusAmp;
         #endif
 
         void vert(inout appdata_full v, out Input data){
@@ -54,16 +57,17 @@
             float radius = base.w;
             float length = rotation.w;
 
-            float2 xy = float2(cos(phi), sin(phi)) * radius * ((float)(_SegmentCount - seg) / (float)_SegmentCount);
+            float2 xy = float2(cos(phi), sin(phi)) * radius * _RadiusAmp * ((float)(_SegmentCount - seg) / (float)_SegmentCount);
             float4 offset = float4(xy, v.vertex.z * length * _ZScale, 1.0);
             
-            float a = -rotation.x;
-            float b = -rotation.y;
-            float c = -rotation.z;
+            float a = rotation.x;
+            float b = rotation.y;
+            float c = rotation.z;
+            
 
             float4 low1 = float4(cos(a) * cos(b) * cos(c) - sin(a) * sin(c), -cos(a) * cos(b) * sin(c) - sin(a) * cos(c), cos(a) * sin(b), 0);
             float4 low2 = float4(sin(a) * cos(b) * cos(c) + cos(a) * sin(c), -sin(a) * cos(b) * sin(c) + cos(a) * cos(c), sin(a) * sin(b), 0);
-            float4 low3 = float4(-sin(b) * cos(c), sin(b) * sin(c), cos(b), 0);
+            float4 low3 = float4(-sin(b) * cos(c), sin(b) * sin(c), cos(b), 0); 
             float4 low4 = float4(0, 0, 0, 1);
             float4x4 rotateMat;
             rotateMat._11_12_13_14 = low1;
@@ -71,25 +75,25 @@
             rotateMat._31_32_33_34 = low3;
             rotateMat._41_42_43_44 = low4;
 
+            
             if(seg != 0){
                 offset.x += snoise(float3(
-                    (float)seg * 0.02 + sin(_Time.x + id * 0.1),
-                    radius + sin(_Time.x +(float)seg * 0.03) * cos(_Time.y -  id * 0.1),
-                    length + cos(_Time.y))) * _NoisePower;
+                    (float)seg * 0.02 + sin((_Time.x + id * 0.1) * _Frequency),
+                    radius + sin(_Frequency *(_Time.x +(float)seg * 0.03)) * cos(_Frequency * (_Time.y -  id * 0.1)),
+                    length + cos(_Frequency * (_Time.y)))) * _NoisePower;
                      
                 offset.y += snoise(float3(
-                    (float)seg * 0.02 + cos(_Time.y), 
-                    radius - sin(_Time.y) * cos(_Time.x +(float)seg * 0.03 + id * 0.1), 
-                    length + cos(_Time.x +(float)seg * 0.03 + id *0.2))) * _NoisePower;
+                    (float)seg * 0.02 + cos(_Time.y * _Frequency), 
+                    radius - sin(_Time.y *  _Frequency) * cos(_Frequency * (_Time.x +(float)seg * 0.03 + id * 0.1)), 
+                    length + cos(_Frequency * (_Time.x +(float)seg * 0.03 + id *0.2)))) * _NoisePower;
             }
-
-            float3 pos = mul(offset, rotateMat).xyz;
+            
+            float3 pos = mul(rotateMat, offset).xyz;
+            float3 n_normal = float3(cos(phi), sin(phi), 0);
             if(seg!=0) pos += _Gravity * (abs(pos.x) + abs(pos.y - 1.5)) * 0.03;
 
-            v.vertex.xyz = (base.xyz + pos.xyz) * _Scale;
-
-            float3 n_normal = float3(cos(phi), sin(phi), 0);
-            v.normal.xyz = mul(n_normal, rotateMat);
+            v.vertex.xyz = base.xyz + pos.xyz * _Scale;
+            v.normal.xyz = mul(rotateMat, n_normal);
 
         #endif
         }

@@ -21,14 +21,13 @@ void RecalcPositions (uint id : SV_DispatchThreadID)
 	float3 p3 = CurrPositionBuffer[int2(id3, 0)].xyz;
 
 	PositionBuffer[id].xyz = weights.x * p1 + weights.y * p2 + weights.z * p3;
-
-	//return;
 	
 	float3 n1 = CurrNormalBuffer[int2(id1, 0)].xyz;
 	float3 n2 = CurrNormalBuffer[int2(id2, 0)].xyz;
 	float3 n3 = CurrNormalBuffer[int2(id3, 0)].xyz;
 	
-	float3 forward = weights.x * n1 + weights.y * n2 + weights.z * n3;
+	float3 forward = (weights.x * n1.xyz + weights.y * n2.xyz + weights.z * n3.xyz).xyz;
+
 	float3 up = float3(0, 1.0, 0);
 	float3 v1 = normalize(forward);
 	float3 v2 = normalize(cross(up, v1));
@@ -76,12 +75,30 @@ void RecalcPositions (uint id : SV_DispatchThreadID)
 		quaternion.z = 0.5 * num5;
 		quaternion.w = (m01 - m10) * num2;
 	}
-
+	float PI = 3.14159265;
 	float4 q = quaternion;
+	q = q / length(q);
 	float rotz = atan2(2.0 * (q.x * q.y + q.z * q.w), 1.0 - 2.0 * (q.y * q.y + q.z * q.z));
 	float roty = asin(2 * (q.x * q.z - q.w * q.y));
 	float rotx = atan2(2.0 * (q.x * q.w + q.y * q.z), 1.0 - 2.0 * (q.z * q.z + q.w * q.w));
-	float3 rot = float3(rotx, roty, rotz);
+	
+	/*
+	float sin = 2 * (q.x * q.z - q.w * q.y);
+	float roty_cos = acos(sqrt(1 - sin * sin));
+	if(roty < 0 && roty_cos > PI * 0.5) {
+		roty -= PI * 0.5;
+	}else if(roty > 0 && roty_cos > PI * 0.5){
+		roty += PI * 0.5;
+	}
+	*/
+	
+	
+
+	//float rotx = atan2(forward.y, forward.z);
+	//float roty = atan2(forward.z, forward.x);
+	//float rotz = atan2(forward.y, forward.x);
+
+	float3 rot = float3(rotx * 2.0, roty * 2.0, rotz * 2.0);
 	RotationBuffer[id].xyz = rot;
 	//http://answers.unity3d.com/questions/467614/what-is-the-source-code-of-quaternionlookrotation.html
 	//https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles

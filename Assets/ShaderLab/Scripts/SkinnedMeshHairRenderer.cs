@@ -11,10 +11,12 @@ namespace ShaderLab{
 		[SerializeField] float _scale = 1.0f;
 		[SerializeField] float _zScale = 0.07f;
 		[SerializeField] float _noisePower = 0.1f;
+		[SerializeField] float _frequency = 1.0f;
+		[SerializeField] float _radiusAmp = 1.0f;
 		[SerializeField] Vector3 _gravity = new Vector3(0f, -8.0f, 4.0f);
 		[SerializeField] Color _color = new Vector4(0,0,0,0);
 		[SerializeField] Color _gradcolor = new Vector4(0,0,0,0);
-
+		
 		uint[] _drawArgs = new uint[5]{0, 0, 0, 0, 0};
 		ComputeBuffer _drawArgsBuffer;
 		ComputeBuffer positionBuffer;
@@ -62,6 +64,8 @@ namespace ShaderLab{
 			_material.SetFloat("_NoisePower",_noisePower);
 			_material.SetVector("_Gravity", _gravity);
 			_material.SetFloat("_Scale",_scale);
+			_material.SetFloat("_Frequency", _frequency);
+			_material.SetFloat("_RadiusAmp", _radiusAmp);
 			_material.SetColor("_MainColor", _color);
 			_material.SetColor("_GradColor", _gradcolor);
 			_material.SetBuffer("_PositionBuffer", positionBuffer);
@@ -100,7 +104,6 @@ namespace ShaderLab{
 			indicesBuffer = new ComputeBuffer(_instanceCount * 3, sizeof(int));
 			weightsBuffer = new ComputeBuffer(_instanceCount, sizeof(float) * 3);
 
-		
 			Vector4[] positions = new Vector4[_instanceCount];
 			Vector4[] rotations = new Vector4[_instanceCount];
 			int[] indices = new int[_instanceCount * 3];
