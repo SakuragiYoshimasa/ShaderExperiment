@@ -106,8 +106,8 @@ namespace ShaderLab{
 
 			Vector4[] positions = new Vector4[_instanceCount];
 			Vector4[] rotations = new Vector4[_instanceCount];
-			int[] indices = new int[_instanceCount * 3];
 			Vector3[] weights = new Vector3[_instanceCount];
+			int[] indices = new int[_instanceCount * 3];
 
 			_skinnedMeshR.BakeMesh(_targetmesh);
 			int targetTriangleCount = _targetmesh.triangles.Length / 3;

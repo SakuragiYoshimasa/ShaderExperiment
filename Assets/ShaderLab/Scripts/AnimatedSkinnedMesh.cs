@@ -57,7 +57,7 @@ namespace ShaderLab{
 			//Layer Setting to Cilling mask
 			camera.cullingMask = 1 << LayerMask.NameToLayer("PositionExtractedMesh");
 			camera.SetReplacementShader(positionExtractionShader, "Extract");
-			ReceateMesh();
+			RecreateMesh();
 
 			targetSMR.receiveShadows = false;
 			targetSMR.gameObject.layer = LayerMask.NameToLayer("PositionExtractedMesh");
@@ -83,7 +83,7 @@ namespace ShaderLab{
 			prevPositionBuffer = temp;
 		}
 
-		void ReceateMesh(){
+		void RecreateMesh(){
 			//Recalculate index of vertices to uv
 			Mesh mesh = new Mesh();
 			Mesh origMesh = targetSMR.sharedMesh;

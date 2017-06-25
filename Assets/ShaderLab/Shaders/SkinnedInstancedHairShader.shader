@@ -59,12 +59,12 @@
 
             float2 xy = float2(cos(phi), sin(phi)) * radius * _RadiusAmp * ((float)(_SegmentCount - seg) / (float)_SegmentCount);
             float4 offset = float4(xy, v.vertex.z * length * _ZScale, 1.0);
+            float3 n_normal = float3(cos(phi), sin(phi), 0);
             
             float a = rotation.x;
             float b = rotation.y;
             float c = rotation.z;
             
-
             float4 low1 = float4(cos(a) * cos(b) * cos(c) - sin(a) * sin(c), -cos(a) * cos(b) * sin(c) - sin(a) * cos(c), cos(a) * sin(b), 0);
             float4 low2 = float4(sin(a) * cos(b) * cos(c) + cos(a) * sin(c), -sin(a) * cos(b) * sin(c) + cos(a) * cos(c), sin(a) * sin(b), 0);
             float4 low3 = float4(-sin(b) * cos(c), sin(b) * sin(c), cos(b), 0); 
@@ -75,7 +75,6 @@
             rotateMat._31_32_33_34 = low3;
             rotateMat._41_42_43_44 = low4;
 
-            
             if(seg != 0){
                 offset.x += snoise(float3(
                     (float)seg * 0.02 + sin((_Time.x + id * 0.1) * _Frequency),
@@ -89,10 +88,10 @@
             }
             
             float3 pos = mul(rotateMat, offset).xyz;
-            float3 n_normal = float3(cos(phi), sin(phi), 0);
+            n_normal = float3(cos(phi), sin(phi), 0);
             if(seg!=0) pos += _Gravity * (abs(pos.x) + abs(pos.y - 1.5)) * 0.03;
 
-            v.vertex.xyz = base.xyz + pos.xyz * _Scale;
+            v.vertex.xyz = (base.xyz + pos.xyz) * _Scale;
             v.normal.xyz = mul(rotateMat, n_normal);
 
         #endif
