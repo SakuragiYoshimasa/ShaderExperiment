@@ -9,8 +9,8 @@ namespace ShaderLab {
 		[SerializeField] public Mesh mesh;
 
 		public void RebuildMesh(){
+            
 			List<Vector3> vertices = new List<Vector3>();
-
 			for(int i = 0; i < segments + 1; i++){
 				for(int j = 0; j < divisions + 1; j++){
 					float phai = Mathf.PI * 2.0f * (float)j / (float)divisions;

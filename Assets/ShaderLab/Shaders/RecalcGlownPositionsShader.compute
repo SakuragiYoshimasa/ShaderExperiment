@@ -81,24 +81,8 @@ void RecalcPositions (uint id : SV_DispatchThreadID)
 	float rotz = atan2(2.0 * (q.x * q.y + q.z * q.w), 1.0 - 2.0 * (q.y * q.y + q.z * q.z));
 	float roty = asin(2 * (q.x * q.z - q.w * q.y));
 	float rotx = atan2(2.0 * (q.x * q.w + q.y * q.z), 1.0 - 2.0 * (q.z * q.z + q.w * q.w));
-	
-	/*
-	float sin = 2 * (q.x * q.z - q.w * q.y);
-	float roty_cos = acos(sqrt(1 - sin * sin));
-	if(roty < 0 && roty_cos > PI * 0.5) {
-		roty -= PI * 0.5;
-	}else if(roty > 0 && roty_cos > PI * 0.5){
-		roty += PI * 0.5;
-	}
-	*/
-	
-	
-
-	//float rotx = atan2(forward.y, forward.z);
-	//float roty = atan2(forward.z, forward.x);
-	//float rotz = atan2(forward.y, forward.x);
-
 	float3 rot = float3(rotx * 2.0, roty * 2.0, rotz * 2.0);
+	
 	RotationBuffer[id].xyz = rot;
 	//http://answers.unity3d.com/questions/467614/what-is-the-source-code-of-quaternionlookrotation.html
 	//https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles

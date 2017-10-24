@@ -39,7 +39,7 @@ namespace Utility {
 
 				if (captureNum < CAPTURE_MAX_NUM) {
 					
-					Application.CaptureScreenshot(folderPath + "/" + (captureNum + 1).ToString().PadLeft(2, '0') + ".png");
+					ScreenCapture.CaptureScreenshot(folderPath + "/" + (captureNum + 1).ToString().PadLeft(2, '0') + ".png");
 				} else {
 					
 					Debug.Log ("Finish Capturing");

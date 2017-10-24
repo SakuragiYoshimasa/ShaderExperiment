@@ -24,14 +24,15 @@ namespace ShaderLab{
 		ComputeBuffer indicesBuffer;
 		ComputeBuffer weightsBuffer;
 		ComputeBuffer prevPositionBuffer;
-		
+		[SerializeField] ComputeShader _recalcGlownPositionsShader;
+
 		SkinnedMeshRenderer _skinnedMeshR;
 		Mesh _targetmesh;
 		Bounds _bounds = new Bounds(Vector3.zero, Vector3.one * 4 * 32);
 		MaterialPropertyBlock _props;
 		AnimatedSkinnedMesh asm;
 
-		[SerializeField] ComputeShader _recalcGlownPositionsShader;
+		
 
 		void Start(){
 			
@@ -76,12 +77,13 @@ namespace ShaderLab{
 
 		void UpdatePositionBuffer(){
 		
-			int kernel =_recalcGlownPositionsShader.FindKernel("RecalcPositions");
+			
 			prevPositionBuffer = positionBuffer;
 			var data = new Vector4[_instanceCount];
 			positionBuffer.GetData(data);
 			prevPositionBuffer.SetData(data);
 			
+			int kernel =_recalcGlownPositionsShader.FindKernel("RecalcPositions");
 			_recalcGlownPositionsShader.SetBuffer(kernel, "PositionBuffer", positionBuffer); 
 			_recalcGlownPositionsShader.SetBuffer(kernel, "RotationBuffer", rotationBuffer); 
 			_recalcGlownPositionsShader.SetBuffer(kernel, "IndicesBuffer", indicesBuffer);  

@@ -74,6 +74,7 @@
             rotateMat._21_22_23_24 = low2;
             rotateMat._31_32_33_34 = low3;
             rotateMat._41_42_43_44 = low4;
+            
 
             if(seg != 0){
                 offset.x += snoise(float3(
